@@ -23,6 +23,8 @@ jobs:
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
     steps:
+      - name: Display event name
+        run: echo ${{ github.event_name }}
       - name: Checkout
         uses: actions/checkout@v2
       - name: Setup .NET Core
@@ -67,10 +69,10 @@ jobs:
           dotnet-version: 3.1.301
       - name: Create Release NuGet package
         run: |
-          echo "VERSION=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_ENV
-          echo Version: ${VERSION}
-          dotnet pack -v normal -c Release --include-symbols --include-source -p:PackageVersion=${VERSION} -o nupkg src/$PROJECT_NAME/$PROJECT_NAME.csproj
+          VERSION=${GITHUB_REF/refs\/tags\/v/}
+          echo Version: $VERSION
+          dotnet pack -v normal -c Release -p:PackageVersion=$VERSION -o nupkg src/$PROJECT_NAME/$PROJECT_NAME.csproj
       - name: Push to GitHub Feed
-        run: dotnet nuget push ${PROJECT_NAME}.${VERSION}.nupkg --source https://nuget.pkg.github.com/Aqovia/index.json --api-key ${GITHUB_TOKEN}
-      - name: Push to NuGet Feed
-        run: dotnet nuget push ./nupkg/*.nupkg --source $NUGET_FEED --skip-duplicate --api-key $NUGET_KEY
+        run: dotnet nuget push ./nupkg/*.nupkg --source https://nuget.pkg.github.com/Aqovia/index.json --api-key ${GITHUB_TOKEN}
+      # - name: Push to NuGet Feed
+      #   run: dotnet nuget push ./nupkg/*.nupkg --source $NUGET_FEED --skip-duplicate --api-key $NUGET_KEY

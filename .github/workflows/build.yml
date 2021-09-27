@@ -72,7 +72,7 @@ jobs:
         run: |
           VERSION=${GITHUB_REF/refs\/tags\/v/}
           echo Version: $VERSION
-          dotnet pack -v normal -c Release -p:PackageVersion=$VERSION -o nupkg src/$PROJECT_NAME/$PROJECT_NAME.csproj
+          dotnet pack -v normal -c Release -p:Version=$VERSION -o nupkg src/$PROJECT_NAME/$PROJECT_NAME.csproj
       - name: Push to GitHub Feed
         run: dotnet nuget push ./nupkg/*.nupkg --source https://nuget.pkg.github.com/Aqovia/index.json --api-key ${GITHUB_TOKEN}
       # - name: Push to NuGet Feed

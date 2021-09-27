@@ -12,6 +12,7 @@ env:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   # Project name to pack and publish
   PROJECT_NAME: DurableFunctions.Test
+  TEST_PROJECT_NAME: DurableFunctions.Test.EndToEndTests
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   # Official NuGet Feed settings
   NUGET_FEED: https://api.nuget.org/v3/index.json
@@ -35,8 +36,8 @@ jobs:
         run: dotnet restore
       - name: Build
         run: dotnet build -c Release --no-restore
-      # - name: Test
-      #   run: dotnet test -c Release
+      - name: Test
+        run: dotnet test -c Release test/$TEST_PROJECT_NAME
       - name: Pack
         if: matrix.os == 'ubuntu-latest'
         run: dotnet pack -v normal -c Release --no-restore -p:PackageVersion=$GITHUB_RUN_ID src/$PROJECT_NAME/$PROJECT_NAME.csproj

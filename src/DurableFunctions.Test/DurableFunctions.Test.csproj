@@ -3,9 +3,6 @@
 	<PropertyGroup>
 		<TargetFramework>netcoreapp3.1</TargetFramework>
 		<PackageId>DurableFunctions.Test</PackageId>
-		<Company>Aqovia</Company>
-		<Authors>Aqovia</Authors>
-		<Version>0.0.1</Version>
 		<Description>Test infrastructure for Azure durable functions v2</Description>
 		<IsPackable>true</IsPackable>
 		<RepositoryType>git</RepositoryType>

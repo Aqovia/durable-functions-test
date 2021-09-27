@@ -5,6 +5,8 @@
 		<PackageId>DurableFunctions.Test</PackageId>
 		<Description>Test infrastructure for Azure durable functions v2</Description>
 		<IsPackable>true</IsPackable>
+		<RepositoryType>git</RepositoryType>
+    	<RepositoryUrl>https://github.com/Aqovia/durable-functions-test</RepositoryUrl>
 	</PropertyGroup>
 
 	<ItemGroup>

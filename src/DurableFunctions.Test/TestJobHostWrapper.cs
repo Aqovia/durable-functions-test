@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -114,7 +113,6 @@ namespace DurableFunctions.Test
             return (_orchestrationState, history);
         }
         
-
         public TestLogger GetLoggerByCategoryName(string categoryName)
         {
             return _loggerProvider.CreatedLoggers.SingleOrDefault(l => l.Category == categoryName);

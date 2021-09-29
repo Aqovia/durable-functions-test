@@ -1,6 +1,7 @@
 name: .NET Core
 on:
   push:
+    branches
   pull_request:
   release:
     types:
@@ -19,10 +20,7 @@ env:
   NUGET_KEY: ${{ secrets.NUGET_KEY }}
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
+    runs-on: ubuntu-latest
     steps:
       - name: Display event name
         run: echo ${{ github.event_name }}
@@ -32,6 +30,15 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 3.1.301
+      - name: Install NPM
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12'
+      - name: Install Azurite
+        run: |
+          sudo npm install -g azurite
+          sudo mkdir azurite
+          sudo azurite --silent --location azurite --debug azurite\debug.log &        
       - name: Restore
         run: dotnet restore
       - name: Build
@@ -39,10 +46,8 @@ jobs:
       - name: Test
         run: dotnet test -c Release test/${{ env.TEST_PROJECT_NAME }}
       - name: Pack
-        if: matrix.os == 'ubuntu-latest'
         run: dotnet pack -v normal -c Release --no-restore -p:PackageVersion=$GITHUB_RUN_ID src/$PROJECT_NAME/$PROJECT_NAME.csproj
       - name: Upload Artifact
-        if: matrix.os == 'ubuntu-latest'
         uses: actions/upload-artifact@v2
         with:
           name: nupkg

@@ -33,12 +33,7 @@ jobs:
       - name: Install NPM
         uses: actions/setup-node@v1
         with:
-          node-version: '12'
-      - name: Install Azurite
-        run: |
-          sudo npm install -g azurite
-          sudo mkdir azurite
-          sudo azurite --silent --location azurite --debug azurite\debug.log &        
+          node-version: '12'   
       - name: Restore
         run: dotnet restore
       - name: Build

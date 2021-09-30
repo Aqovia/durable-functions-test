@@ -29,18 +29,15 @@ namespace SampleFunctionApp
             {
                 await context.CallActivityWithRetryAsync("SampleActivityFunction", retryOptions, testString);
             }
-            catch (AggregateException ex)
-            {
-                var failureReason = "Validation failed - Null or empty fields: " + string.Join("\n", ex.InnerExceptions.Select(_ => _.Message));
-                _logger.LogError(failureReason);
-            }
-            catch (Exception ex)
-            {
-                var failureReason = $"Failed to provision EVC with error: {ex.Message}";
-                _logger.LogError(ex, failureReason);
+            catch(Exception ex)
+            {            
+                string exMsg = (ex is AggregateException)
+                    ? string.Join("\n", (ex as AggregateException).InnerExceptions.Select(_ => _.Message))
+                    : ex.Message;
+
+                _logger.LogError($"CallActivityWithRetryAsync('SampleActivityFunction') failed:{exMsg}");
             }
         }
-
 
         [FunctionName("SampleFunction")]
         public async Task<IActionResult> SampleFunction(

@@ -161,6 +161,7 @@ namespace DurableFunctions.Test
                     webJobsBuilder =>
                     {
                         webJobsBuilder.Services.AddSingleton<IDurabilityProviderFactory, EmulatorDurabilityProviderFactory>();
+                        webJobsBuilder.AddHttp();
                         webJobsBuilder.AddDurableTask(options);
                         webJobsBuilder.AddAzureStorage();
                     })

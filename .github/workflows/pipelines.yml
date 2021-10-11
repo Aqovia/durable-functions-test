@@ -1,0 +1,135 @@
+name: CI
+on:
+  push:
+  pull_request:
+    branches:
+      - master
+env:
+  # Stop wasting time caching packages
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  # Disable sending usage data to Microsoft
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  # Project name to pack and publish
+  PROJECT_NAME: DurableFunctions.Test
+  # Extra varibale to target test project
+  TEST_PROJECT_NAME: DurableFunctions.Test.EndToEndTests
+  # GitHub Packages Feed settings
+  GITHUB_FEED: https://nuget.pkg.github.com/Aqovia/index.json
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  # Official NuGet Feed settings
+  NUGET_FEED: https://api.nuget.org/v3/index.json
+  NUGET_KEY: ${{ secrets.NUGET_KEY }}
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1.301
+      - name: Install NPM
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12'
+      - name: Install Azurite
+        run: |
+          sudo npm install -g azurite
+          sudo mkdir azurite
+          sudo azurite --silent --location azurite --debug azurite\debug.log &        
+      - name: Restore
+        run: dotnet restore
+      - name: Build
+        run: dotnet build -c Release --no-restore
+      - name: Test
+        run: dotnet test -c Release test/${{ env.TEST_PROJECT_NAME }}       
+      - name: Pack
+        run: |
+          LAST_TAGGED_VERSION=`git tag --sort=-committerdate 'p_v*' --merged | head -n 1 | sed -Ee 's/p_v//g'`
+          [ -z $LAST_TAGGED_VERSION ] && LAST_TAGGED_VERSION=0.0.0
+          BRANCH_NAME=`echo ${GITHUB_REF##*/} | sed -Ee 's/[_ ]/-/g'`
+          dotnet pack -v normal -c Release --no-restore -p:Version=$LAST_TAGGED_VERSION-$BRANCH_NAME-$GITHUB_RUN_ID src/$PROJECT_NAME/$PROJECT_NAME.csproj
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: nupkg
+          path: ./src/${{ env.PROJECT_NAME }}/bin/Release/*.nupkg
+  branch_preview:
+    needs: build
+    if: github.event_name == 'push' && github.ref != 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v1
+        with:
+          name: nupkg
+      - name: Push to GitHub Feed
+        run: dotnet nuget push ./nupkg/*.nupkg --source ${{ env.GITHUB_FEED }} --api-key ${GITHUB_TOKEN}
+  deploy:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set config
+        run: |
+          git config --global user.name "aqovia-build"
+          git config --global user.email aqovia-build@github.no-reply.com
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Prepare release branch
+        run: |
+          #check to see if the release branch is already created if not create and push it - else move onto it and merge latest master          
+          if git fetch origin release; then
+            git checkout release && git merge master
+          else
+            git checkout -b release && git push -u origin release
+          fi
+      - name: Derive Version
+        run: |
+          LAST_TAGGED_VERSION=`git tag --list --sort=-committerdate 'v*' | head -1 | sed -Ee 's/v//g'`
+          [ -z $LAST_TAGGED_VERSION ] && LAST_TAGGED_VERSION=0.0.0
+          BUMP=`echo $(git log --no-merges -n 1 --format="%B") | perl -nE'say/bump:\s*(major|minor|patch)/'`
+          [ -z $BUMP ] && BUMP=patch && echo "Setting BUMP to default (patch)" && echo $BUMP
+          NEW_VERSION=`.github/scripts/semver bump $BUMP $LAST_TAGGED_VERSION` && echo $NEW_VERSION && echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV                    
+      - name: Prepare Release Note
+        run: |
+          echo "## $NEW_VERSION" >> /tmp/note.md
+          echo "$(git log --no-merges -n 1 --format="- %s (%h) (%an) %n%b" | sed -Ee 's/bump:\s*(major|minor|patch)//g' | sed -Ee 's/ \(#[0-9+]\)//g' | sed -Ee 's/Co-authored-by.*$//g')" >> /tmp/note.md
+          [ -e RELEASE_NOTES.md ] || touch RELEASE_NOTES.md
+          cat /tmp/note.md RELEASE_NOTES.md >> /tmp/release_note.md
+          mv /tmp/release_note.md RELEASE_NOTES.md
+      - name: Commit Release
+        run: |
+          TAG_NAME=v${{ env.NEW_VERSION }}
+          PRE_TAG_NAME=p_$TAG_NAME
+          PRE_TAG_HASH=`git log --no-merges -n 1 --format="%h"`
+          
+          git tag $PRE_TAG_NAME $PRE_TAG_HASH
+          git add RELEASE_NOTES.md
+          git commit -m "Release commit ${{ env.NEW_VERSION }}"
+          git tag $TAG_NAME
+          git push
+          git push -f origin $TAG_NAME
+          git push -f origin $PRE_TAG_NAME
+          echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
+
+      - name: Create a GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ env.TAG_NAME }}
+          release_name: Release ${{ env.TAG_NAME }}
+          body_path: /tmp/note.md
+          prerelease: false
+      - name: Create Release NuGet package
+        run: |
+          dotnet pack -v normal -c Release -p:Version=${{ env.NEW_VERSION }} -o nupkg src/$PROJECT_NAME/$PROJECT_NAME.csproj
+      - name: Push to GitHub Feed
+        run: dotnet nuget push ./nupkg/*.nupkg --source ${{ env.GITHUB_FEED }} --api-key ${GITHUB_TOKEN}
+      # - name: Push to NuGet Feed
+      #   run: dotnet nuget push ./nupkg/*.nupkg --source $NUGET_FEED --skip-duplicate --api-key $NUGET_KEY

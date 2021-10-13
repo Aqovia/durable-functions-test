@@ -19,6 +19,10 @@ env:
   # Official NuGet Feed settings
   NUGET_FEED: https://api.nuget.org/v3/index.json
   NUGET_KEY: ${{ secrets.NUGET_KEY }}
+
+  AQOVIA_NUGET_OSS_FEED: https://pkgs.dev.azure.com/aqovia-opensource/4feb2f54-ea14-4724-966c-b30048d22334/_packaging/NuGetOSS/nuget/v3/index.json
+  AQOVIA_NUGET_OSS_KEY: ${{ secrets.AQOVIA_NUGET_OSS_KEY }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -114,6 +118,11 @@ jobs:
       - name: Push to GitHub Feed
         if: success() && steps.prepare-release.outputs.new-version
         run: dotnet nuget push ./nupkg/*.nupkg --source ${{ env.GITHUB_FEED }} --api-key ${GITHUB_TOKEN}
+      - name: Push to GitHub Feed
+        if: success() && steps.prepare-release.outputs.new-version
+        run: | 
+          echo "${#${{ AQOVIA_NUGET_OSS_KEY }}}"
+          dotnet nuget push ./nupkg/*.nupkg --source ${{ env.AQOVIA_NUGET_OSS_FEED }} --api-key ${{ env.AQOVIA_NUGET_OSS_KEY }}
       # - name: Push to NuGet Feed
       #   if: success() && steps.prepare-release.outputs.new-version
       #   run: dotnet nuget push ./nupkg/*.nupkg --source $NUGET_FEED --skip-duplicate --api-key $NUGET_KEY

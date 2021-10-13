@@ -121,7 +121,6 @@ jobs:
       - name: Push to GitHub Feed
         if: success() && steps.prepare-release.outputs.new-version
         run: | 
-          echo "${#${{ AQOVIA_NUGET_OSS_KEY }}}"
           dotnet nuget push ./nupkg/*.nupkg --source ${{ env.AQOVIA_NUGET_OSS_FEED }} --api-key ${{ env.AQ_NUGET_OSS_KEY }}
       # - name: Push to NuGet Feed
       #   if: success() && steps.prepare-release.outputs.new-version

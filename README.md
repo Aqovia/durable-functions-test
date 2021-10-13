@@ -60,8 +60,8 @@ Assuming the repository is cloned and up-to-date (`develop` branch). Assume usin
 ## Release Process
 
 - The release process is automated by the CI process for every successful merge to master.
-- Squach-Commmit messages are extracted from log and used to create a RELEASE_NOTES.md which is automatically updated and found on the `release` branch
-- Inclusion of the keywords (bump: major|minor|patch) in the squash commit message is sufficient for the developer to control the upgrade to the final semantic version of the package
+- The PR request title and description are used to create the Release note found via the `Releases` link on the repo landing page
+- Inclusion of the keywords (bump: major|minor|patch) in the PR description is sufficient for the developer to control the upgrade to the final semantic version of the package
 - Branch Preview packages are also available via the Github Feeds
 - Release packages are available on the Nuget and Github feeds
 - Githib release info is also available to view/compare and download source via the repo landing page

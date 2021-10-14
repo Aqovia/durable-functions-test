@@ -124,4 +124,4 @@ jobs:
         env:
           NUGET_AUTH_TOKEN: ${{ env.AQOVIA_NUGET_OSS_KEY }}
       - name: Publish the package to Azure Artifacts
-        run: dotnet nuget push ./nupkg/*.nupkg
+        run: dotnet nuget push ./nupkg/*.nupkg --source ${{ env.AQOVIA_NUGET_OSS_FEED }} --api-key AzureArtifact

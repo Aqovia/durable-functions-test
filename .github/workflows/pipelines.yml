@@ -118,10 +118,10 @@ jobs:
       - name: Push to GitHub Feed
         if: success() && steps.prepare-release.outputs.new-version
         run: dotnet nuget push ./nupkg/*.nupkg --source ${{ env.GITHUB_FEED }} --api-key ${GITHUB_TOKEN}
-      - name: Push to GitHub Feed
-        if: success() && steps.prepare-release.outputs.new-version
-        run: | 
-          dotnet nuget push ./nupkg/*.nupkg --source ${{ env.AQOVIA_NUGET_OSS_FEED }} --api-key ${{ env.AQOVIA_NUGET_OSS_KEY }}
-      # - name: Push to NuGet Feed
-      #   if: success() && steps.prepare-release.outputs.new-version
-      #   run: dotnet nuget push ./nupkg/*.nupkg --source $NUGET_FEED --skip-duplicate --api-key $NUGET_KEY
+      - uses: actions/setup-dotnet@v1
+        with:
+          source-url: ${{ env.AQOVIA_NUGET_OSS_FEED }}
+        env:
+          NUGET_AUTH_TOKEN: ${{ env.AQOVIA_NUGET_OSS_KEY }}
+      - name: Publish the package to Azure Artifacts
+        run: dotnet nuget push ./nupkg/*.nupkg

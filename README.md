@@ -8,7 +8,7 @@ Nuget Info
 
 Build status
 
-![.NET Core](https://github.com/Aqovia/durable-functions-test/workflows/Nuget%20Publish%20CI/badge.svg?branch=master)
+[![.NET Core](https://github.com/Aqovia/durable-functions-test/workflows/Nuget%20Publish%20CI/badge.svg?branch=master)](https://github.com/Aqovia/durable-functions-test/actions?query=branch%3Amaster)
 
 [![Windows Build history](https://buildstats.info/github/chart/Aqovia/durable-functions-test?branch=master&includeBuildsFromPullRequest=false)](https://github.com/Aqovia/durable-functions-test/actions?query=branch%3Amaster)
 

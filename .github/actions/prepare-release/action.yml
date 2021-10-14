@@ -22,22 +22,22 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - id: download-semver-tool
-      run: |
-        if [[ ! -d "/tmp/semver-tool-3.2.0" ]] ; then
-          pushd /tmp
-          curl -LO 'https://github.com/fsaintjacques/semver-tool/archive/refs/tags/3.2.0.zip'
-          unzip 3.2.0.zip
-          popd
-        fi
-      shell: bash
     - id: finalise-release
       run: |
+        SEMVER_TOOL_VERSION=3.2.0
+        
+        if [[ ! -d "/tmp/semver-tool-$SEMVER_TOOL_VERSION" ]] ; then
+          pushd /tmp
+          curl -LO 'https://github.com/fsaintjacques/semver-tool/archive/refs/tags/$SEMVER_TOOL_VERSION.zip'
+          unzip $SEMVER_TOOL_VERSION.zip
+          popd
+        fi
+
         ## Extract the sem ver bump from the PR body - default to patch bump if no bump message found
         BUMP=`echo -ne "${{ inputs.pr-body }}" | perl -nE'say/bump:\s*(major|minor|patch)/' | tr -d '\r\n'` && [ -z $BUMP ] && BUMP=patch
         
         ## Use the 3rd party tool (semver-tool) to deduce the new sem version
-        NEW_VERSION=`/tmp/semver-tool-3.2.0/src/semver bump $BUMP ${{ inputs.last-tagged-version }}`
+        NEW_VERSION=`/tmp/semver-tool-$SEMVER_TOOL_VERSION/src/semver bump $BUMP ${{ inputs.last-tagged-version }}`
         
         ## Prepare release note (extracted from PR title and body) - store in temp file
         echo "### ${{ inputs.pr-title }}" >> /tmp/note.md

@@ -1,11 +1,15 @@
 using DurableTask.Core;
 using FluentAssertions;
+using Microsoft.Azure.ServiceBus;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using SampleFunctionApp;
+using SampleFunctionApp.Models;
 using SampleFunctionApp.Services;
 using System;
+using System.Linq;
 using Xunit.Abstractions;
 using Xbehave;
 
@@ -21,7 +25,7 @@ namespace DurableFunctions.Test.EndToEndTests
         }
 
         [Scenario]
-        public void SampleFunctionTest()
+        public void HttpTriggerFunctionTest()
         {
             HttpRequest httpRequest = null;
             TestJobHostWrapper host = null;
@@ -43,13 +47,78 @@ namespace DurableFunctions.Test.EndToEndTests
                 await host.StopAsync().ConfigureAwait(false);
             });
 
-            "WHEN the SampleFunction is completed successfully".x(async () =>
+            "WHEN the HttpTriggerFunction is invoked it completed successfully".x(async () =>
             {
                 //get the method info of the function-under-test
-                var fut = typeof(SampleHttpFunction).GetMethod("SampleFunction");
+                var fut = typeof(SampleFunctions).GetMethod("HttpTriggerFunction");
 
                 //pass the fut to the jobs host for execution
-                await host.CallAsync(instanceId, fut, new { req=httpRequest }).ConfigureAwait(false);
+                await host.CallAsync(fut, new { req=httpRequest }).ConfigureAwait(false);
+                await host.WaitForOrchestrationAsync(instanceId).ConfigureAwait(false);
+            });
+
+            "THEN the internal orchestration should complete successfully".x(async () =>
+            {
+                var (orchestrationState, _) = await host.GetLastOrchestrationStateWithHistoryAsync();
+                orchestrationState.Should().NotBeNull();
+                orchestrationState.OrchestrationStatus.Should().Be(OrchestrationStatus.Completed);
+                orchestrationState.Name.Should().Be("SampleOrchestration");                
+            });
+
+            "AND an message should be published".x(() =>
+            {
+                var messageQueueService = (FakeMessageQueueService)host.GetService<IMessageQueueService>();
+                var messages = messageQueueService.Messages;
+                
+                messages.Count.Should().Be(1);
+                messages[0].Should().Be("hello");
+            });
+
+            "AND a log message should be output".x(() =>
+            {
+                var logger = host.GetLoggerByCategoryName("SampleFunctionApp.SampleFunctions");
+
+                logger.Should().NotBeNull();
+
+                var expectedLogMessages = new[] {
+                    ( LogLevel.Information, "C# HTTP trigger function processed a request." ),
+                    ( LogLevel.Information, $"Started orchestration with ID = '{instanceId}'.")
+                };
+
+                var actualLogMessages = logger.LogMessages.Select(m => (m.Level, m.FormattedMessage)).ToArray();
+                actualLogMessages.Should().BeEquivalentTo(expectedLogMessages, options => options.WithStrictOrdering());
+            });
+        }
+
+        [Scenario]
+        public void ServiceBusTriggerFunctionTest()
+        {
+            Message serviceBusMessage = null;
+            TestJobHostWrapper host = null;
+            var instanceId = "1000";
+         
+            "GIVEN a request is sent to the SampleFunction http endpoint".x(() =>
+            {
+                serviceBusMessage = ServiceBusMessageHelper.CreateNewMessage(instanceId, new TestServiceBusModel { Data="hello" });
+            });
+
+            "AND a job host to perform function execution".x(async () =>
+            {
+                host = CreateTestSampleAppHost(_output);
+                await host.StartAsync().ConfigureAwait(false);
+            })
+            .Teardown(async () =>
+            {
+                await host.StopAsync().ConfigureAwait(false);
+            });
+
+            "WHEN the ServiceBusTriggerFunction is invoked it completed successfully".x(async () =>
+            {
+                //get the method info of the function-under-test
+                var fut = typeof(SampleFunctions).GetMethod("ServiceBusTriggerFunction");
+
+                //pass the fut to the jobs host for execution
+                await host.CallAsync(fut, new { message = serviceBusMessage }).ConfigureAwait(false);
                 await host.WaitForOrchestrationAsync(instanceId).ConfigureAwait(false);
             });
 
@@ -64,10 +133,25 @@ namespace DurableFunctions.Test.EndToEndTests
             "AND an message should be published".x(() =>
             {
                 var messageQueueService = (FakeMessageQueueService)host.GetService<IMessageQueueService>();
-                var messages = messageQueueService.Messages;     
-                
+                var messages = messageQueueService.Messages;
+
                 messages.Count.Should().Be(1);
                 messages[0].Should().Be("hello");
+            });
+
+            "AND a log message should be output".x(() =>
+            {
+                var logger = host.GetLoggerByCategoryName("SampleFunctionApp.SampleFunctions");
+
+                logger.Should().NotBeNull();
+
+                var expectedLogMessages = new[] {
+                    ( LogLevel.Information, "C# Service Bus trigger function processed a request." ),
+                    ( LogLevel.Information, $"Started orchestration with ID = '{instanceId}'.")
+                };
+
+                var actualLogMessages = logger.LogMessages.Select(m => (m.Level, m.FormattedMessage)).ToArray();
+                actualLogMessages.Should().BeEquivalentTo(expectedLogMessages, options => options.WithStrictOrdering());
             });
         }
 
@@ -83,7 +167,7 @@ namespace DurableFunctions.Test.EndToEndTests
             //types that contain the required trigger/activity functions
             var functionTypes = new Type[]
             {
-                    typeof(SampleHttpFunction),
+                    typeof(SampleFunctions),
                     typeof(ActivityFunctions)
             };
 

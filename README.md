@@ -50,7 +50,7 @@ Contains sample tests for demonstrating the usage of the test library.
 
 Tests include:
 1. Http triggered function -> Orchestration function -> Activity function
-2. Service Bus triggered function -> Orchestration function -> Activity function (Todo)
+2. Service Bus triggered function -> Orchestration function -> Activity function
 3. Service Bus triggered function -> Orchestration function -> Http Client (Todo)
 4. Queue triggered function -> Orchestration function -> Sub-Orchestration -> Activity Function (Todo)
 

@@ -72,7 +72,7 @@ namespace SampleFunctionApp
         public async Task ServiceBusTriggerFunction([ServiceBusTrigger("TOPIC_NAME","SUBSCRIPTION_NAME")] Message message, 
             [DurableClient] IDurableOrchestrationClient starter)
         {
-            _logger.LogInformation("C# Service Bus trigger function processed a request.");
+            _logger.LogInformation("C# Service Bus trigger function processed a message.");
 
             var instanceId = message.MessageId;
             var input = JsonConvert.DeserializeObject<TestServiceBusModel>(Encoding.UTF8.GetString(message.Body));

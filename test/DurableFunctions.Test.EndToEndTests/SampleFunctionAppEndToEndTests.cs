@@ -31,7 +31,7 @@ namespace DurableFunctions.Test.EndToEndTests
             TestJobHostWrapper host = null;
             var instanceId = "1000";
 
-            "GIVEN a request is sent to the SampleFunction http endpoint".x(() =>
+            "GIVEN a http request is ready for processing".x(() =>
             {
                 var fakeUri = string.Format("https://fakehost.com/api/SampleHttpFunction?id={0}&data=hello", instanceId);
                 httpRequest = HttpTestHelper.CreateHttpRequest("get", fakeUri);
@@ -74,7 +74,7 @@ namespace DurableFunctions.Test.EndToEndTests
                 messages[0].Should().Be("hello");
             });
 
-            "AND a log message should be output".x(() =>
+            "AND the log messages should be as expected".x(() =>
             {
                 var logger = host.GetLoggerByCategoryName("SampleFunctionApp.SampleFunctions");
 
@@ -97,7 +97,7 @@ namespace DurableFunctions.Test.EndToEndTests
             TestJobHostWrapper host = null;
             var instanceId = "1000";
          
-            "GIVEN a request is sent to the SampleFunction http endpoint".x(() =>
+            "GIVEN a service bus message is ready for processing".x(() =>
             {
                 serviceBusMessage = ServiceBusMessageHelper.CreateNewMessage(instanceId, new TestServiceBusModel { Data="hello" });
             });
@@ -139,14 +139,14 @@ namespace DurableFunctions.Test.EndToEndTests
                 messages[0].Should().Be("hello");
             });
 
-            "AND a log message should be output".x(() =>
+            "AND the log messages should be as expected".x(() =>
             {
                 var logger = host.GetLoggerByCategoryName("SampleFunctionApp.SampleFunctions");
 
                 logger.Should().NotBeNull();
 
                 var expectedLogMessages = new[] {
-                    ( LogLevel.Information, "C# Service Bus trigger function processed a request." ),
+                    ( LogLevel.Information, "C# Service Bus trigger function processed a message." ),
                     ( LogLevel.Information, $"Started orchestration with ID = '{instanceId}'.")
                 };
 

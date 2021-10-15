@@ -128,4 +128,5 @@ jobs:
         env:
           new_version: ${{ steps.prepare-release.outputs.new-version }}
       - name: Publish the package to Nuget feed
+        if: success() && steps.prepare-release.outputs.new-version
         run: dotnet nuget push ./nupkg/*.nupkg --source ${{ env.NUGET_FEED }} --skip-duplicate --api-key ${{ env.NUGET_KEY }}

@@ -20,6 +20,7 @@ Aqovia.DurableFunctions.Testing provides functionality to test a durable functio
 
 * Install and start Azure Storage Emulator (or Azurite)
 * Include the Nuget package in your test project
+  - https://www.nuget.org/packages/Aqovia.DurableFunctions.Testing/
 * Include the durable task libs in your project
 
 
@@ -55,18 +56,18 @@ Tests include:
 
 ## Contributing
 
-Assuming the repository is cloned and up-to-date (`develop` branch). Assume using approximation to git flow branch naming convention.
+Assuming the repository is cloned and up-to-date (`master` branch)
 
-1. Create a branch from `master` branch using `git checkout -b feature/new_feature`
+1. Create a branch from `master` using `git checkout -b new_feature_branch`
 2. Implement changes on new feature branch
 3. Test and build locally - updating tests if required
 4. Push to remote and fix any remote build/test issues
 5. Create a pull request to the `master` branch
-  - once all checks and reviews are passed you will be able to merge the branch via squash-commit merging
-  - at this point you should create a summary ofthe new feature or fix in the provided commit message ui fields
-    - if this merge implements a new fix include the string 'bump: patch'
-	- if this merge implements a new feature include the string 'bump: minor'
-	- if this merge implements a new feature with breaking changes include the string 'bump: major'
+  - include a well-formed title and description as these will be included in the release notes if/when the feature is merged to master
+  - include also in your description one of the following strings
+    - 'bump: patch' - if this PR implements a new fix
+    - 'bump: minor' - if this PR implements a new feature
+    - 'bump: major' - if this PR implements a new feature with breaking changes
     
 ## Release Process
 

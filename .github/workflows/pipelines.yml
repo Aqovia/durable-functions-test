@@ -13,10 +13,10 @@ env:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   
   # Project name to pack and publish
-  PROJECT_NAME: DurableFunctions.Test
+  PROJECT_NAME: Aqovia.DurableFunctions.Testing
   
   # Extra varibale to target test project
-  TEST_PROJECT_NAME: DurableFunctions.Test.EndToEndTests
+  TEST_PROJECT_NAME: Aqovia.DurableFunctions.Testing.EndToEndTests
   
   # Github auth token
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

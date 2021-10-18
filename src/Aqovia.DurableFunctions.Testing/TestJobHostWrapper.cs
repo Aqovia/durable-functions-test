@@ -13,7 +13,7 @@ using Microsoft.Extensions.Hosting;
 using Xunit.Abstractions;
 
 
-namespace DurableFunctions.Test
+namespace Aqovia.DurableFunctions.Testing
 {
     public class TestJobHostWrapper : IDisposable
     {

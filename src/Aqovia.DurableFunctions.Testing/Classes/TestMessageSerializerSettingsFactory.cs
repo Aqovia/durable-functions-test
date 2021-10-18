@@ -1,7 +1,7 @@
 ﻿using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Newtonsoft.Json;
 
-namespace DurableFunctions.Test
+namespace Aqovia.DurableFunctions.Testing
 {
     internal class TestMessageSerializerSettingsFactory : IMessageSerializerSettingsFactory
     {

@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Xunit.Abstractions;
 
 
-namespace DurableFunctions.Test
+namespace Aqovia.DurableFunctions.Testing
 {
     public class TestLogger : ILogger
     {

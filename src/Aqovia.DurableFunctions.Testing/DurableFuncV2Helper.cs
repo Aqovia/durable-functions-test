@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 
-namespace DurableFunctions.Test
+namespace Aqovia.DurableFunctions.Testing
 {
     public static class DurableFuncV2Helper
     {

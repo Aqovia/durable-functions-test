@@ -4,7 +4,7 @@ using System;
 using System.Reflection;
 using System.Text;
 
-namespace DurableFunctions.Test
+namespace Aqovia.DurableFunctions.Testing
 {
     public static class ServiceBusMessageHelper
     {

@@ -13,7 +13,7 @@ using System.Linq;
 using Xunit.Abstractions;
 using Xbehave;
 
-namespace DurableFunctions.Test.EndToEndTests
+namespace Aqovia.DurableFunctions.Testing.EndToEndTests
 {
     public class SampleFunctionAppEndToEndTests
     {

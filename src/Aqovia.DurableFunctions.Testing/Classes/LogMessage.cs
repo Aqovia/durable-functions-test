@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 using Microsoft.Extensions.Logging;
 
-namespace DurableFunctions.Test
+namespace Aqovia.DurableFunctions.Testing
 {
     public class LogMessage
     {

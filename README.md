@@ -30,13 +30,13 @@ The project contains the following directory structure
 
 ```
 src/
-    DurableFunctions.Test
+    Aqovia.DurableFunctions.Testing
 test/
-    DurableFunctions.Test.EndToEndTests
+    Aqovia.DurableFunctions.Testing.EndToEndTests
     SampleFunctionApp
 ```
 
-### src/DurableFunctions.Test
+### src/Aqovia.DurableFunctions.Testing
 
 Contains the source library code for creating an in-process job host. A wrapper is provided to configure this job host as the per the function app which is under test by providing fake service instances to the DI container.
 
@@ -44,7 +44,7 @@ Contains the source library code for creating an in-process job host. A wrapper 
 
 Contains a basic function app (created from visual studio template) - which can be used as a test app for demonstrating/testing the test library.
 
-### test/DurableFunctions.Test.EndToEndTests
+### test/Aqovia.DurableFunctions.Testing.EndToEndTests
 
 Contains sample tests for demonstrating the usage of the test library. 
 

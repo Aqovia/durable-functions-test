@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\DurableFunctions.Test\DurableFunctions.Test.csproj" />
+    <ProjectReference Include="..\..\src\Aqovia.DurableFunctions.Testing\Aqovia.DurableFunctions.Testing.csproj" />
     <ProjectReference Include="..\SampleFunctionApp\SampleFunctionApp.csproj" />
   </ItemGroup>
 

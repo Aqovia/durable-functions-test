@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using SampleFunctionApp.Services;
 
-namespace DurableFunctions.Test.EndToEndTests
+namespace Aqovia.DurableFunctions.Testing.EndToEndTests
 {
     public class FakeMessageQueueService : IMessageQueueService
     {

@@ -50,7 +50,7 @@ Contains sample tests for demonstrating the usage of the test library.
 
 Tests include:
 1. Http triggered function -> Orchestration function -> Activity function
-2. Service Bus triggered function -> Orchestration function -> Activity function (Todo)
+2. Service Bus triggered function -> Orchestration function -> Activity function
 3. Service Bus triggered function -> Orchestration function -> Http Client (Todo)
 4. Queue triggered function -> Orchestration function -> Sub-Orchestration -> Activity Function (Todo)
 
@@ -76,5 +76,5 @@ Assuming the repository is cloned and up-to-date (`master` branch)
 - Inclusion of the keywords (bump: major|minor|patch) in the PR description is sufficient for the developer to control the upgrade to the final semantic version of the package
 - Branch Preview packages are also available via the Aqovia Nuget OSS Feeds (publically available)
 - Release packages are available on the [Nuget.org](https://www.nuget.org/packages/Aqovia.DurableFunctions.Testing) 
-- Githib release info is also available to view/compare and download source via the repo landing page
+- Github release info is also available to view/compare and download source via the repo landing page
 

@@ -2,7 +2,7 @@
 
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 
-namespace DurableFunctions.Test
+namespace Aqovia.DurableFunctions.Testing
 {
     internal class DurableHttpMessageHandlerFactory : IDurableHttpMessageHandlerFactory
     {

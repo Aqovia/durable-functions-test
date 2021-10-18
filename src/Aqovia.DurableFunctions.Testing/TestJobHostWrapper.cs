@@ -13,7 +13,7 @@ using Microsoft.Extensions.Hosting;
 using Xunit.Abstractions;
 
 
-namespace DurableFunctions.Test
+namespace Aqovia.DurableFunctions.Testing
 {
     public class TestJobHostWrapper : IDisposable
     {
@@ -28,7 +28,17 @@ namespace DurableFunctions.Test
         private JobHost _jobHost;
         private OrchestrationState _orchestrationState;
         private bool disposedValue;
-
+        
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="testOutputHelper">Pass in this test output helper (XBehave) class - this utilises the test output helper of the test suite</param>
+        /// <param name="functionTypes">Classes that contain the trigger/orchstestration/activity functions</param>
+        /// <param name="serviceCollection">
+        /// An externally defined list of service bindings which must be specified for the internal construction of the job host
+        /// This list should reflect the bindings that the real function app has configured in Startup.cs:ConfigureServices
+        /// Any scoped services can be defined as transient for the purposes of the testing
+        /// </param>
         public TestJobHostWrapper(ITestOutputHelper testOutputHelper,
             Type[] functionTypes, ServiceCollection serviceCollection = null)
         {
@@ -37,12 +47,24 @@ namespace DurableFunctions.Test
 
             ServiceCollection = serviceCollection;
         }
-       
+
+       /// <summary>
+       /// GetService
+       /// Extract a service from the internal DI container
+       /// Provides functionality to retrieve a fake service and interogate any results that have been cached
+       /// </summary>
+       /// <typeparam name="T"></typeparam>
+       /// <returns>The required service</returns>
         public T GetService<T>()
         {
             return _innerHost.Services.GetRequiredService<T>();
         }
 
+        /// <summary>
+        /// Stop Async
+        /// Stop the internal job host and dispose of it
+        /// </summary>
+        /// <returns></returns>
         public async Task StopAsync()
         {
             try
@@ -59,6 +81,12 @@ namespace DurableFunctions.Test
             }            
         }
 
+        /// <summary>
+        /// StartAsync
+        /// Start the internal job host after first checking service bindings have been provided
+        /// Cache references to the durability provider factory and durability provider for later inspection
+        /// </summary>
+        /// <returns></returns>
         public async Task StartAsync()
         {
             if(ServiceCollection == null || !ServiceCollection.Any())
@@ -82,7 +110,19 @@ namespace DurableFunctions.Test
             }
         }
 
-        public async Task CallAsync(string instanceId, MethodInfo methodUnderTest, object arguments = default)
+        /// <summary>
+        /// CallAsync
+        /// When invoked passes a method info object to the job host to perform internal execution
+        /// Methods passed in should be trigger functions that invoke internal orchestrations
+        /// </summary>
+        /// <param name="methodUnderTest">A reflective method info object with the details of the function to invoke</param>
+        /// <param name="arguments">A dictionary of arguments to pass to the function when bindings are resolved
+        /// IMPORTANT: members of this dictionary should match the argument names of the function you are attempting to call
+        /// ie. if your function has arguments ie (Message message, int count) then this param would be
+        /// new { message=new Message(), count=10 }
+        /// </param>
+        /// <returns></returns>
+        public async Task CallAsync(MethodInfo methodUnderTest, object arguments = default)
         {
             //if the host is not initialised start it up at this point
             if(_innerHost == null)
@@ -94,6 +134,13 @@ namespace DurableFunctions.Test
 
         }
 
+        /// <summary>
+        /// WaitForOrchestrationAsync
+        /// Finds a previously invoked orchestration by instanceid - and then blocks waiting for that orchestration to complete
+        /// Used in the test code to wait for orchestration completion
+        /// </summary>
+        /// <param name="instanceId"></param>
+        /// <returns></returns>
         public async Task WaitForOrchestrationAsync(string instanceId)
         {
             var timeout = Debugger.IsAttached ? TimeSpan.FromMinutes(5) : TimeSpan.FromSeconds(30);
@@ -102,6 +149,11 @@ namespace DurableFunctions.Test
             _orchestrationState = await _durabilityProvider.WaitForOrchestrationAsync(instanceId, _orchestrationState.OrchestrationInstance.ExecutionId, timeout, CancellationToken.None);
         }
 
+        /// <summary>
+        /// GetLastOrchestrationStateWithHistoryAsync
+        /// Extracts the required orchestration state and the history of the orchestration
+        /// </summary>
+        /// <returns>A tuple of required orchestration state and the history of the orchestration</returns>
         public async Task<(OrchestrationState, string)> GetLastOrchestrationStateWithHistoryAsync()
         {
             if(_orchestrationState == null)
@@ -112,15 +164,16 @@ namespace DurableFunctions.Test
             var history = await _durabilityProvider.GetOrchestrationHistoryAsync(_orchestrationState.OrchestrationInstance.InstanceId, _orchestrationState.OrchestrationInstance.ExecutionId);
             return (_orchestrationState, history);
         }
-        
+
+        /// <summary>
+        /// GetLoggerByCategoryName
+        /// Retrieves a logger from the loggerProvider using a categrory name search
+        /// This can be used to interrogate the logging of each function that has registered a logger with the loggerProvider
+        /// </summary>
+        /// <param name="categoryName">Search string to locate the required logger</param>
+        /// <returns>A test logger</returns>
         public TestLogger GetLoggerByCategoryName(string categoryName)
         {
-            return _loggerProvider.CreatedLoggers.SingleOrDefault(l => l.Category == categoryName);
-        }
-
-        public TestLogger GetLoggerByFunctionName(string functionName)
-        {
-            var categoryName = $"Function.{functionName}.User";
             return _loggerProvider.CreatedLoggers.SingleOrDefault(l => l.Category == categoryName);
         }
 
@@ -137,6 +190,9 @@ namespace DurableFunctions.Test
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void Dispose()
         {
             Dispose(disposing: true);

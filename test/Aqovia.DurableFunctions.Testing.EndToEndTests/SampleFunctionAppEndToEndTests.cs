@@ -59,7 +59,7 @@ namespace Aqovia.DurableFunctions.Testing.EndToEndTests
 
             "THEN the internal orchestration should complete successfully".x(async () =>
             {
-                var (orchestrationState, _) = await host.GetLastOrchestrationStateWithHistoryAsync();
+                var (orchestrationState, _) = await host.GetOrchestrationStateWithHistoryAsync(instanceId);
                 orchestrationState.Should().NotBeNull();
                 orchestrationState.OrchestrationStatus.Should().Be(OrchestrationStatus.Completed);
                 orchestrationState.Name.Should().Be("SampleOrchestration");                
@@ -124,7 +124,7 @@ namespace Aqovia.DurableFunctions.Testing.EndToEndTests
 
             "THEN the internal orchestration should complete successfully".x(async () =>
             {
-                var (orchestrationState, _) = await host.GetLastOrchestrationStateWithHistoryAsync();
+                var (orchestrationState, _) = await host.GetOrchestrationStateWithHistoryAsync(instanceId);
                 orchestrationState.Should().NotBeNull();
                 orchestrationState.OrchestrationStatus.Should().Be(OrchestrationStatus.Completed);
                 orchestrationState.Name.Should().Be("SampleOrchestration");

@@ -158,9 +158,8 @@ namespace Aqovia.DurableFunctions.Testing
         {
             var orchestrationState = (await _durabilityProvider.GetOrchestrationStateAsync(instanceId, allExecutions: false)).First();
             if (orchestrationState == null)
-            {
-                throw new Exception("Orchestration state is null");
-            }
+                return default;
+
 
             var history = await _durabilityProvider.GetOrchestrationHistoryAsync(orchestrationState.OrchestrationInstance.InstanceId, orchestrationState.OrchestrationInstance.ExecutionId);
             return (orchestrationState, history);

@@ -26,7 +26,6 @@ namespace Aqovia.DurableFunctions.Testing
         private IDurabilityProviderFactory _durabilityProviderFactory;
         private DurabilityProvider _durabilityProvider;
         private JobHost _jobHost;
-        private OrchestrationState _orchestrationState;
         private bool disposedValue;
         
         /// <summary>
@@ -145,24 +144,25 @@ namespace Aqovia.DurableFunctions.Testing
         {
             var timeout = Debugger.IsAttached ? TimeSpan.FromMinutes(5) : TimeSpan.FromSeconds(30);
 
-            _orchestrationState = (await _durabilityProvider.GetOrchestrationStateAsync(instanceId, allExecutions: false)).First();
-            _orchestrationState = await _durabilityProvider.WaitForOrchestrationAsync(instanceId, _orchestrationState.OrchestrationInstance.ExecutionId, timeout, CancellationToken.None);
+            var orchestrationState = (await _durabilityProvider.GetOrchestrationStateAsync(instanceId, allExecutions: false)).First();
+            await _durabilityProvider.WaitForOrchestrationAsync(instanceId, orchestrationState.OrchestrationInstance.ExecutionId, timeout, CancellationToken.None);
         }
 
         /// <summary>
-        /// GetLastOrchestrationStateWithHistoryAsync
-        /// Extracts the required orchestration state and the history of the orchestration
+        /// GetOrchestrationStateWithHistoryAsync
+        /// Extracts the required orchestration state and the history of the orchestration by instance Id
         /// </summary>
+        /// <param name="instanceId"></param>
         /// <returns>A tuple of required orchestration state and the history of the orchestration</returns>
-        public async Task<(OrchestrationState, string)> GetLastOrchestrationStateWithHistoryAsync()
+        public async Task<(OrchestrationState, string)> GetOrchestrationStateWithHistoryAsync(string instanceId)
         {
-            if(_orchestrationState == null)
-            {
-                throw new Exception("Orchestration state is null");
-            }
+            var orchestrationState = (await _durabilityProvider.GetOrchestrationStateAsync(instanceId, allExecutions: false)).First();
+            if (orchestrationState == null)
+                return default;
 
-            var history = await _durabilityProvider.GetOrchestrationHistoryAsync(_orchestrationState.OrchestrationInstance.InstanceId, _orchestrationState.OrchestrationInstance.ExecutionId);
-            return (_orchestrationState, history);
+
+            var history = await _durabilityProvider.GetOrchestrationHistoryAsync(orchestrationState.OrchestrationInstance.InstanceId, orchestrationState.OrchestrationInstance.ExecutionId);
+            return (orchestrationState, history);
         }
 
         /// <summary>

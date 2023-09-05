@@ -81,7 +81,7 @@ namespace Aqovia.DurableFunctions.Testing.EndToEndTests
                 logger.Should().NotBeNull();
 
                 var expectedLogMessages = new[] {
-                    ( LogLevel.Information, "C# HTTP trigger function processed a request." ),
+                    ( LogLevel.Information, "C# HTTP trigger function 'HttpTriggerFunction' processed a request." ),
                     ( LogLevel.Information, $"Started orchestration with ID = '{instanceId}'.")
                 };
 

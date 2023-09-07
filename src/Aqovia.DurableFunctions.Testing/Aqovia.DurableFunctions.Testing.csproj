@@ -22,11 +22,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Azure.DurableTask.Core" Version="2.14.0" />
 		<PackageReference Include="Microsoft.Azure.ServiceBus" Version="4.1.2" />
-		<PackageReference Include="Microsoft.Azure.WebJobs" Version="3.0.37" />
-		<PackageReference Include="Microsoft.Azure.WebJobs.Extensions.DurableTask" Version="2.11.1" />
-		<PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Http" Version="3.2.0" />
+		<PackageReference Include="Microsoft.Azure.WebJobs" Version="3.0.31" />
+		<PackageReference Include="Microsoft.Azure.WebJobs.Extensions.DurableTask" Version="2.8.1" />
+		<PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Http" Version="3.0.2" />
 		<PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Storage" Version="3.0.0" />
 		<PackageReference Include="Microsoft.Azure.DurableTask.Emulator" Version="2.5.4" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.19" />

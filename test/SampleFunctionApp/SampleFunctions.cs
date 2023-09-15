@@ -47,10 +47,13 @@ namespace SampleFunctionApp
 
         [FunctionName("HttpTriggerFunction")]
         public async Task<IActionResult> HttpTriggerFunction(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req, [DurableClient] IDurableOrchestrationClient starter)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)]
+            HttpRequest req,
+            ExecutionContext context,
+            [DurableClient] IDurableOrchestrationClient starter)
         {
-            _logger.LogInformation("C# HTTP trigger function processed a request.");
-
+            _logger.LogInformation($"C# HTTP trigger function '{context.FunctionName}' processed a request.");
+            
             string data = req.Query["data"];
             string id = req.Query["id"];
 

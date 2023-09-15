@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -6,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using DurableTask.Core;
+using DurableTask.Core.Query;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.DependencyInjection;
@@ -175,6 +177,20 @@ namespace Aqovia.DurableFunctions.Testing
         public TestLogger GetLoggerByCategoryName(string categoryName)
         {
             return _loggerProvider.CreatedLoggers.SingleOrDefault(l => l.Category == categoryName);
+        }
+
+        /// <summary>
+        /// Fetches a read-only list of OrchestrationState objects, optionally filtered by the provided query parameter.
+        /// This method is especially useful when the instance ID(s) of the target orchestration(s) are unknown.
+        /// Omitting the query argument will fetch all OrchestrationStates
+        /// </summary>
+        /// <param name="query">An optional parameter of type OrchestrationQuery to filter the results.</param>
+        /// <returns>Returns a read-only collection containing OrchestrationState objects.</returns>
+        public async Task<IReadOnlyCollection<OrchestrationState>> GetOrchestrationStatesAsync(OrchestrationQuery query = null)
+        {
+            return (await ((IOrchestrationServiceQueryClient)_durabilityProvider).GetOrchestrationWithQueryAsync(
+                query ?? new OrchestrationQuery(),
+                CancellationToken.None)).OrchestrationState;
         }
 
         protected virtual void Dispose(bool disposing)

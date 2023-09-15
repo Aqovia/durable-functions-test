@@ -10,6 +10,7 @@ using SampleFunctionApp.Models;
 using SampleFunctionApp.Services;
 using System;
 using System.Linq;
+using DurableTask.Core.Query;
 using Xunit.Abstractions;
 using Xbehave;
 
@@ -57,6 +58,18 @@ namespace Aqovia.DurableFunctions.Testing.EndToEndTests
                 await host.WaitForOrchestrationAsync(instanceId).ConfigureAwait(false);
             });
 
+            "AND only one orchestration was started".x(async () =>
+            {
+                var orchestrations = await host.GetOrchestrationStatesAsync(
+                    // test query functionality:
+                    new OrchestrationQuery
+                    {
+                        CreatedTimeFrom = DateTime.MinValue
+                    });
+                orchestrations.Single().OrchestrationInstance.InstanceId
+                    .Should().Be(instanceId);
+            });
+
             "THEN the internal orchestration should complete successfully".x(async () =>
             {
                 var (orchestrationState, _) = await host.GetOrchestrationStateWithHistoryAsync(instanceId);
@@ -81,7 +94,7 @@ namespace Aqovia.DurableFunctions.Testing.EndToEndTests
                 logger.Should().NotBeNull();
 
                 var expectedLogMessages = new[] {
-                    ( LogLevel.Information, "C# HTTP trigger function processed a request." ),
+                    ( LogLevel.Information, "C# HTTP trigger function 'HttpTriggerFunction' processed a request." ),
                     ( LogLevel.Information, $"Started orchestration with ID = '{instanceId}'.")
                 };
 
@@ -128,6 +141,13 @@ namespace Aqovia.DurableFunctions.Testing.EndToEndTests
                 orchestrationState.Should().NotBeNull();
                 orchestrationState.OrchestrationStatus.Should().Be(OrchestrationStatus.Completed);
                 orchestrationState.Name.Should().Be("SampleOrchestration");
+            });
+
+            "AND only one orchestration was started".x(async () =>
+            {
+                var orchestrations = await host.GetOrchestrationStatesAsync();
+                orchestrations.Single().OrchestrationInstance.InstanceId
+                    .Should().Be(instanceId);
             });
 
             "AND an message should be published".x(() =>

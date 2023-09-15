@@ -162,6 +162,7 @@ namespace Aqovia.DurableFunctions.Testing
                     {
                         webJobsBuilder.Services.AddSingleton<IDurabilityProviderFactory, EmulatorDurabilityProviderFactory>();
                         webJobsBuilder.AddHttp();
+                        webJobsBuilder.AddExecutionContextBinding();
                         webJobsBuilder.AddDurableTask(options);
                         webJobsBuilder.AddAzureStorage();
                     })

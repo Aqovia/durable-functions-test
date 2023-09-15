@@ -9,7 +9,6 @@ using SampleFunctionApp;
 using SampleFunctionApp.Models;
 using SampleFunctionApp.Services;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using DurableTask.Core.Query;
 using Xunit.Abstractions;

@@ -110,7 +110,7 @@ jobs:
         # if: success() && steps.pr.outputs.number
         uses: ./.github/actions/prepare-release
         with:
-          last-tagged-version: 'dummy_tag'
+          last-tagged-version: '1.0.0'
           pr-title: 'dummy_title'
           pr-body: 'dummy_body'
       # - name: Prepare Release

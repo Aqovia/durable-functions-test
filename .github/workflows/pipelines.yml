@@ -88,7 +88,7 @@ jobs:
         run: dotnet nuget push ./nupkg/*.nupkg --source ${{ env.NUGET_PREVIEW_FEED }} --api-key AzureArtifact
   deploy:
     needs: build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/github-actions-failure-test'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

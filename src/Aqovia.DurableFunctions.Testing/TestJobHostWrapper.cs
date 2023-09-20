@@ -14,7 +14,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Xunit.Abstractions;
 
-
 namespace Aqovia.DurableFunctions.Testing
 {
     public class TestJobHostWrapper : IDisposable

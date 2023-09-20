@@ -9,7 +9,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-
 namespace Aqovia.DurableFunctions.Testing
 {
     public static class DurableFuncV2Helper
